@@ -1,0 +1,116 @@
+
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Råvarukollen</title>
+<style>
+:root{--g:#176b4b;--g2:#e9f4ed;--ink:#19251e;--muted:#68766e;--line:#e1e9e3;--bg:#f4f7f5;--red:#a33b35;--amber:#fff4df}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{background:linear-gradient(120deg,#14583e,#21815a);color:#fff;padding:25px max(18px,calc((100% - 1120px)/2))}
+header h1{margin:0;font-size:27px}header p{margin:5px 0 0;color:#dcefe4}.tag{font-size:12px;border:1px solid #ffffff55;border-radius:30px;padding:6px 10px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+main{max-width:1120px;margin:22px auto;padding:0 16px 40px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}.tab{padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;font-weight:650;cursor:pointer}.tab.active{background:var(--g);color:white;border-color:var(--g)}
+.panel{background:#fff;border:1px solid var(--line);border-radius:15px;padding:19px;margin-bottom:15px;box-shadow:0 3px 14px #173d2909}.panel h2{margin:0 0 4px;font-size:19px}.sub{margin:0 0 16px;color:var(--muted);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.field{display:flex;flex-direction:column;gap:5px}.field label{font-size:12px;font-weight:700;color:var(--muted)}input,select{width:100%;min-width:0;padding:10px;border:1px solid #d5dfd8;border-radius:9px;background:white;color:var(--ink);font:inherit}
+.day{border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:10px}.dayhead{font-weight:700;margin-bottom:9px}.daygrid{display:grid;grid-template-columns:2fr 1fr;gap:10px}
+.actions{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-top:15px}.primary{background:var(--g);color:#fff;border:0;border-radius:9px;padding:11px 16px;font-weight:700;cursor:pointer}.secondary{background:var(--g2);color:var(--g);border:1px solid #cfe2d5;border-radius:9px;padding:8px 11px;font-weight:650;cursor:pointer}.danger{background:#fff0ef;color:var(--red);border:1px solid #f0d1ce;border-radius:8px;padding:6px 9px;cursor:pointer}
+.note{background:#eef6f0;color:#315c43;border-radius:10px;padding:11px 13px;font-size:13px;margin:12px 0}.warning{background:var(--amber);color:#76531b}.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px}.metric{background:#f7faf8;border:1px solid var(--line);border-radius:12px;padding:14px}.metric b{display:block;font-size:24px;letter-spacing:-.5px}.metric span{font-size:12px;color:var(--muted)}
+.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:10px;border-bottom:1px solid var(--line);white-space:nowrap}th{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.35px}
+.hidden{display:none!important}.empty{text-align:center;padding:22px;color:var(--muted);background:#f8faf8;border-radius:10px}.good{color:#16804d}.bad{color:#b04a3d}.small{font-size:12px;color:var(--muted)}
+footer{text-align:center;color:#849188;font-size:12px;padding:20px}
+@media(max-width:760px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}header{padding:20px}main{padding:0 12px 30px}.panel{padding:15px}}
+@media(max-width:430px){.grid{grid-template-columns:1fr 1fr}.daygrid{grid-template-columns:1fr 1fr}.daygrid .wide{grid-column:1/-1}}
+</style>
+</head>
+<body>
+<header><div class="top"><div><h1>📊 Råvarukollen</h1><p>Veckovis kontroll på råvaror, inventering och budget.</p></div><span class="tag">Ekonomisk uppföljning</span></div></header>
+<main>
+<nav class="tabs">
+<button class="tab active" data-tab="register">Registrera vecka</button>
+<button class="tab" data-tab="overview">Översikt</button>
+<button class="tab" data-tab="history">Historik</button>
+<button class="tab" data-tab="settings">Inställningar</button>
+</nav>
+<section id="register" class="view">
+<div class="panel">
+<h2>Veckans siffror</h2><p class="sub">Registrera intäkter, inköp och inventeringsvärden för en vecka.</p>
+<div class="grid">
+<div class="field"><label>Vecka</label><input id="week" type="number" min="1" max="53" placeholder="Ex. 47"></div>
+<div class="field"><label>År</label><input id="year" type="number" min="2020" max="2100"></div>
+<div class="field"><label>Månad</label><select id="month"><option value="1">Januari</option><option value="2">Februari</option><option value="3">Mars</option><option value="4">April</option><option value="5">Maj</option><option value="6">Juni</option><option value="7">Juli</option><option value="8">Augusti</option><option value="9">September</option><option value="10">Oktober</option><option value="11">November</option><option value="12">December</option></select></div>
+<div class="field"><label>Budgetmål råvaror (%)</label><input id="target" type="number" min="0" max="100" step=".1" value="35"></div>
+</div>
+<div class="grid" style="margin-top:12px">
+<div class="field"><label>Intäkter (kr)</label><input id="revenue" type="number" min="0" step=".01" placeholder="0"></div>
+<div class="field"><label>Inventering ingående (kr)</label><input id="opening" type="number" min="0" step=".01" placeholder="0"></div>
+<div class="field"><label>Inventering utgående (kr)</label><input id="closing" type="number" min="0" step=".01" placeholder="0"></div>
+<div class="field"><label>Anteckning (valfritt)</label><input id="note" placeholder="Ex. lovvecka, avvikelse"></div>
+</div>
+<div class="note"><b>Så räknar Råvarukollen:</b> Förbrukning = inköp + ingående lager − utgående lager. Råvaruprocent = förbrukning ÷ intäkter × 100. Ange inventeringsvärdena konsekvent för samma periodgränser.</div>
+<h3 style="font-size:16px;margin:20px 0 7px">Inköp under veckan</h3><p class="sub">Lägg in inköp per dag. Du kan lägga till flera inköpsrader samma dag.</p>
+<div id="purchases"></div>
+<div class="actions"><button class="secondary" id="addPurchase">+ Lägg till inköpsrad</button></div>
+<div class="panel" style="background:#f7faf8;margin-top:17px;margin-bottom:0">
+<h3 style="margin:0 0 10px;font-size:16px">Preliminärt veckresultat</h3>
+<div class="cards">
+<div class="metric"><b id="previewPurchases">0 kr</b><span>Inköp</span></div>
+<div class="metric"><b id="previewUsage">0 kr</b><span>Beräknad förbrukning</span></div>
+<div class="metric"><b id="previewPercent">–</b><span>Råvaruprocent</span></div>
+<div class="metric"><b id="previewDiff">–</b><span>Avvikelse mot budget</span></div>
+</div></div>
+<div class="actions"><button class="primary" id="save">Spara veckans resultat</button><button class="secondary" id="clear">Rensa formulär</button><span id="message" class="small"></span></div>
+</div>
+</section>
+<section id="overview" class="view hidden">
+<div class="panel"><h2>Översikt</h2><p class="sub">Följ resultatet över tid och jämför med ditt budgetmål.</p>
+<div class="grid">
+<div class="field"><label>År</label><select id="overviewYear"></select></div>
+<div class="field"><label>Månad</label><select id="overviewMonth"><option value="all">Hela året</option><option value="1">Januari</option><option value="2">Februari</option><option value="3">Mars</option><option value="4">April</option><option value="5">Maj</option><option value="6">Juni</option><option value="7">Juli</option><option value="8">Augusti</option><option value="9">September</option><option value="10">Oktober</option><option value="11">November</option><option value="12">December</option></select></div>
+</div><div id="overviewContent" style="margin-top:16px"></div></div>
+</section>
+<section id="history" class="view hidden"><div class="panel"><h2>Historik</h2><p class="sub">Öppna, ändra eller ta bort en tidigare veckoregistrering.</p><div class="tablewrap" id="historyContent"></div></div></section>
+<section id="settings" class="view hidden"><div class="panel"><h2>Inställningar</h2><p class="sub">Anpassa budgetmålet och hantera dina uppgifter.</p>
+<div class="field" style="max-width:300px"><label>Standardmål råvaror (%)</label><input id="defaultTarget" type="number" min="0" max="100" step=".1" value="35"></div>
+<div class="actions"><button class="primary" id="saveSettings">Spara standardmål</button><button class="danger" id="deleteAll">Radera all historik</button></div>
+</div></section>
+<div class="note warning"><b>Testversion:</b> Uppgifterna sparas endast i den här webbläsaren. De delas inte med kollegor och synkas inte mellan enheter. Innan verktyget används skarpt behövs inloggning, behörigheter och en gemensam databas. Kontrollera alltid beräkningarna mot verksamhetens ekonomirutiner.</div>
+</main>
+<footer>Råvarukollen · Ett verktyg för smartare ekonomisk uppföljning</footer>
+<script>
+const KEY='ravarukollen_v1';
+const DAYNAMES=['Måndag','Tisdag','Onsdag','Torsdag','Fredag','Lördag','Söndag'];
+const MONTHS=['','Januari','Februari','Mars','April','Maj','Juni','Juli','Augusti','September','Oktober','November','December'];
+let state=JSON.parse(localStorage.getItem(KEY)||'null')||{target:35,records:[]},editing=null;
+const $=id=>document.getElementById(id);
+const n=v=>Math.max(0,Number(v)||0);
+const money=v=>n(v).toLocaleString('sv-SE',{style:'currency',currency:'SEK',maximumFractionDigits:0});
+const pct=v=>Number(v).toLocaleString('sv-SE',{minimumFractionDigits:1,maximumFractionDigits:2})+' %';
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function persist(){localStorage.setItem(KEY,JSON.stringify(state))}
+function rows(){return [...document.querySelectorAll('.purchase-row')].map(r=>({day:r.querySelector('[data-k=day]').value,description:r.querySelector('[data-k=description]').value.trim(),amount:n(r.querySelector('[data-k=amount]').value)})).filter(x=>x.description||x.amount)}
+function addPurchase(p={}){let wrap=document.createElement('div');wrap.className='purchase-row day';wrap.innerHTML=`<div class="daygrid"><div class="field"><label>Dag</label><select data-k="day">${DAYNAMES.map((d,i)=>`<option value="${i}" ${Number(p.day??0)===i?'selected':''}>${d}</option>`).join('')}</select></div><div class="field"><label>Inköp (kr)</label><input data-k="amount" type="number" min="0" step=".01" value="${p.amount??''}" placeholder="0"></div><div class="field wide"><label>Leverantör / beskrivning</label><input data-k="description" value="${esc(p.description||'')}" placeholder="Ex. Martin & Servera"></div><div class="field" style="justify-content:end"><label>&nbsp;</label><button type="button" class="danger remove">Ta bort rad</button></div></div>`;wrap.querySelector('.remove').onclick=()=>{wrap.remove();updatePreview()};wrap.querySelectorAll('input,select').forEach(x=>x.addEventListener('input',updatePreview));$('purchases').appendChild(wrap)}
+function calc(r){let purchases=r.purchases.reduce((s,p)=>s+n(p.amount),0);let usage=purchases+n(r.opening)-n(r.closing);let percent=r.revenue>0?usage/r.revenue*100:null;let budget=r.revenue*n(r.target)/100;return {purchases,usage,percent,budget,diff:usage-budget}}
+function formData(){return {week:n($('week').value),year:n($('year').value),month:n($('month').value),target:n($('target').value),revenue:n($('revenue').value),opening:n($('opening').value),closing:n($('closing').value),note:$('note').value.trim(),purchases:rows()}}
+function updatePreview(){let r=formData(),c=calc(r);$('previewPurchases').textContent=money(c.purchases);$('previewUsage').textContent=money(c.usage);$('previewPercent').textContent=c.percent===null?'–':pct(c.percent);$('previewDiff').textContent=c.percent===null?'–':money(c.diff);$('previewDiff').className=c.diff<=0?'good':'bad'}
+function reset(){editing=null;$('week').value='';$('year').value=new Date().getFullYear();$('month').value=String(new Date().getMonth()+1);$('target').value=state.target;$('revenue').value='';$('opening').value='';$('closing').value='';$('note').value='';$('purchases').innerHTML='';addPurchase();$('save').textContent='Spara veckans resultat';updatePreview()}
+function openRecord(id){let r=state.records.find(x=>x.id===id);if(!r)return;editing=id;for(let k of ['week','year','month','target','revenue','opening','closing','note'])$(k).value=r[k]??'';$('purchases').innerHTML='';r.purchases.forEach(addPurchase);if(!r.purchases.length)addPurchase();$('save').textContent='Uppdatera veckans resultat';switchTab('register');window.scrollTo({top:0,behavior:'smooth'});updatePreview()}
+$('addPurchase').onclick=()=>{addPurchase();updatePreview()};
+['week','year','month','target','revenue','opening','closing','note'].forEach(id=>$(id).addEventListener('input',updatePreview));
+$('save').onclick=()=>{let r=formData();if(!r.week||r.week>53||!r.year||!r.revenue||!r.target){alert('Fyll i vecka, år, intäkter och budgetmål.');return}if(r.closing>0&&r.opening===0&&!confirm('Ingående inventering är 0 kr. Stämmer det?'))return;if(r.purchases.length===0){alert('Lägg till minst en inköpsrad.');return}let duplicate=state.records.find(x=>x.id!==editing&&x.year===r.year&&x.week===r.week);if(duplicate&&!confirm('Det finns redan en registrering för den veckan. Vill du ersätta den?'))return;r.id=editing||crypto.randomUUID();state.records=state.records.filter(x=>x.id!==editing&&!(x.year===r.year&&x.week===r.week));state.records.push(r);persist();$('message').textContent='Veckan är sparad.';reset();renderAll()};
+$('clear').onclick=()=>{if(confirm('Rensa formuläret?'))reset()};
+function switchTab(id){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('hidden',v.id!==id));document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));if(id==='overview')renderOverview();if(id==='history')renderHistory();if(id==='settings')$('defaultTarget').value=state.target}
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));
+function renderOverview(){let years=[...new Set(state.records.map(r=>r.year))].sort((a,b)=>b-a);if(!years.length)years=[new Date().getFullYear()];let old=$('overviewYear').value;$('overviewYear').innerHTML=years.map(y=>`<option>${y}</option>`).join('');if(years.includes(Number(old)))$('overviewYear').value=old;let year=n($('overviewYear').value),month=$('overviewMonth').value;let rs=[...state.records].filter(r=>r.year===year&&(month==='all'||r.month===n(month))).sort((a,b)=>a.week-b.week);let revenue=rs.reduce((s,r)=>s+n(r.revenue),0),usage=rs.reduce((s,r)=>s+calc(r).usage,0),purchases=rs.reduce((s,r)=>s+calc(r).purchases,0),budgetSpend=rs.reduce((s,r)=>s+r.revenue*r.target/100,0),percent=revenue?usage/revenue*100:null,diff=usage-budgetSpend;$('overviewContent').innerHTML=!rs.length?'<div class="empty">Ingen registrerad data för vald period ännu.</div>':`<div class="cards"><div class="metric"><b>${money(revenue)}</b><span>Intäkter</span></div><div class="metric"><b>${money(purchases)}</b><span>Inköp</span></div><div class="metric"><b>${money(usage)}</b><span>Beräknad förbrukning</span></div><div class="metric"><b>${percent===null?'–':pct(percent)}</b><span>Råvaruprocent</span></div></div><div class="note ${diff<=0?'':'warning'}" style="margin-top:13px">Budgetavvikelse: <b>${money(diff)}</b> ${diff<=0?'under budget':'över budget'} för den valda perioden. Budgeterad förbrukning: ${money(budgetSpend)}.</div><h3 style="font-size:16px;margin:20px 0 8px">Veckornas resultat</h3><div class="tablewrap"><table><thead><tr><th>Vecka</th><th>Månad</th><th>Intäkter</th><th>Inköp</th><th>Förbrukning</th><th>Råvaru-%</th><th>Budgetavvikelse</th></tr></thead><tbody>${rs.map(r=>{let c=calc(r);return `<tr><td>V${r.week}</td><td>${MONTHS[r.month]}</td><td>${money(r.revenue)}</td><td>${money(c.purchases)}</td><td>${money(c.usage)}</td><td><b>${c.percent===null?'–':pct(c.percent)}</b></td><td class="${c.diff<=0?'good':'bad'}">${money(c.diff)}</td></tr>`}).join('')}</tbody></table></div><p class="small">Månads- och årsöversikten summerar registrerade veckor. Om en vecka sträcker sig över två månader behöver den fördelas manuellt för exakt månadsrapportering.</p>`}
+$('overviewYear').onchange=renderOverview;$('overviewMonth').onchange=renderOverview;
+function renderHistory(){let rs=[...state.records].sort((a,b)=>b.year-a.year||b.week-a.week);$('historyContent').innerHTML=!rs.length?'<div class="empty">Ingen historik ännu.</div>':`<table><thead><tr><th>Period</th><th>Intäkter</th><th>Inköp</th><th>Förbrukning</th><th>Råvaru-%</th><th></th></tr></thead><tbody>${rs.map(r=>{let c=calc(r);return `<tr><td>V${r.week} ${r.year}</td><td>${money(r.revenue)}</td><td>${money(c.purchases)}</td><td>${money(c.usage)}</td><td><b>${c.percent===null?'–':pct(c.percent)}</b></td><td><button class="secondary" onclick="openRecord('${r.id}')">Öppna</button> <button class="danger" onclick="deleteRecord('${r.id}')">Ta bort</button></td></tr>`}).join('')}</tbody></table>`}
+function deleteRecord(id){if(!confirm('Ta bort veckans registrering?'))return;state.records=state.records.filter(r=>r.id!==id);persist();renderHistory();renderOverview()}
+$('saveSettings').onclick=()=>{let v=n($('defaultTarget').value);if(v<=0||v>100){alert('Ange ett mål mellan 0 och 100 %.');return}state.target=v;persist();$('target').value=v;alert('Standardmålet är sparat.')}
+$('deleteAll').onclick=()=>{if(confirm('Är du säker? All historik i den här webbläsaren raderas.')){state.records=[];persist();renderAll()}}
+function renderAll(){renderHistory();renderOverview()}
+$('year').value=new Date().getFullYear();$('month').value=String(new Date().getMonth()+1);$('target').value=state.target;addPurchase();updatePreview();renderAll();
+</script>
+</body>
+</html>
